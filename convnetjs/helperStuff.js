@@ -7,7 +7,7 @@ function draw_net() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     var L = brain.value_net.layers;
     var dx = (W - 50) / L.length;
-    var x = 10;
+    var x = 50;
     var y = 40;
     ctx.font = "12px Verdana";
     ctx.fillStyle = "rgb(0,0,0)";
@@ -18,19 +18,19 @@ function draw_net() {
         var n = kw.length;
         var dy = (H - 50) / n;
         ctx.fillStyle = "rgb(0,0,0)";
-        ctx.fillText(L[k].layer_type + "(" + n + ")", x, 35);
+        ctx.fillText(L[k].layer_type + "(" + n + ")", 35, x);
         for (var q = 0; q < n; q++) {
             var v = Math.floor(kw[q] * 100);
             if (v >= 0) ctx.fillStyle = "rgb(0,0," + v + ")";
             if (v < 0) ctx.fillStyle = "rgb(" + (-v) + ",0,0)";
-            ctx.fillRect(x, y, 10, 10);
+            ctx.fillRect(y+100, x, 10, 10);
             y += 12;
-            if (y > H - 25) {
+            if (y > W - 25) {
                 y = 40;
                 x += 12
             };
         }
-        x += 50;
+        x += 20;
         y = 40;
     }
     }

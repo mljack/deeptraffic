@@ -1,6 +1,7 @@
 #page {
-  max-width: 960px;
-  width: 960px;
+  max-width: 1900px;
+  width: 1900px;
+  margin: 0px;
 }
 
 .mainContainer {
@@ -8,10 +9,10 @@
   display: flex;
   -webkit-flex-flow: row nowrap;
   flex-flow: row nowrap;
-  max-width: 960px;
-  width: 960px;
-  padding: 30px 0;
-  margin: 0 -130px;
+  max-width: 1900px;
+  width: 1900px;
+  padding: 0px 0;
+  margin: 0 0px;
 }
 
 canvas#canvas {
@@ -59,6 +60,15 @@ canvas#canvas {
   flex-flow: column nowrap;
 }
 
+.visCol {
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+}
+
 .headline {
   -webkit-flex: 0 1 auto;
   flex: 0 1 auto;
@@ -67,7 +77,8 @@ canvas#canvas {
 .codeBox {
   -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
-  min-height: 170px;
+  min-height: 480px;
+  max-height: 900px;
 }
 
 .button-small {
