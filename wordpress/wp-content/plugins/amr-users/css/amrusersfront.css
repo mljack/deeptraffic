@@ -1,0 +1,363 @@
+/* Almost the wordpress admin css, with modifications to remove non grey colors and make it work hopefully across many themes - offered as a option for the front end if your site has no table or pagination css */
+
+#userlist fieldset legend {
+  padding-left: 0;
+}
+
+#userlist fieldset.select legend {
+  display: none;
+}
+#userlist fieldset.select label {
+  font-weight: bold;
+}
+
+#userlist fieldset li {
+  list-style: none;
+}
+#userlist fieldset  {
+  border: none;
+  padding: 1em;
+  
+}
+
+.search-box { /* adjusted for new query version*/
+	max-width: 50%;
+	min-width: 300px;
+	display: block;
+	float: right;
+}
+
+.search-box,
+.csvlink,
+.perpage-box { 
+	clear: both;
+}
+.csvlink, .refreshlink { 
+	float: left;
+}
+
+.userslist {
+	clear: both;  /* to clear alpha nav if no pagination appears*/
+}
+
+.userlist .tbody  {
+	width: 100%;
+}
+.userlist .tbody .vcard {
+
+}
+.userlistfooter {
+	clear: both;
+	margin:0px auto;
+}
+
+div.tbody .tr,
+div.tbody .vcard, /* html5 style*/
+#userslist2 .tbody .vcard {
+	float: left;
+	width: 280px;
+	padding: 5px; 
+}
+
+div.tbody .tr .td,
+.userlist .tbody .vcard .td {
+	display: block;
+	overflow: hidden;
+}
+
+
+tbody .even,
+.tbody .even .td { /* yes td is a class to get the cell html5 */
+	background-color: #eee;
+}
+
+#userslist2 .tbody .vcard .td1 {
+	float: left;
+	width: 100px;
+}
+
+#userslist1, #userslist2, #userslist3, #userslist4 { /* 20170201 take out the overflow-x*/
+	clear: both;
+}
+
+
+
+form#userlist {
+	width: 100%;
+}
+
+/* the wordpress admin table css, */
+table.userlist {
+	border-radius:3px;
+	border-spacing:0;
+	border-style:solid;
+	border-color:#ddd;
+	border-width:1px;
+	clear: both;
+	margin:auto;
+	width:100%;
+	z-index: 100;
+}
+.userlist * {
+word-wrap:break-word;
+}
+.userlist thead tr th, .userlist tfoot tr th {
+background:#eee scroll left top;
+color:#222;
+}
+.userlist td, .userlist th {
+border-color:#ddd;
+}
+.userlist th, .userlist td {
+overflow:hidden;
+}
+.userlist th,.userlist td {
+line-height:1.3em;
+padding:7px 7px 8px;
+text-align:left;
+}
+.userlist td, .userlist th {
+border-bottom-style:solid;
+border-bottom-width:1px;
+}
+.userlist .site-mature a {
+	color: #660066; /* purple */
+}
+
+.userlist .site-deleted a{
+	color: #996666; /* kind of pale purple*/
+}
+.userlist .site-archived a{
+	color: FFCC99; /* sunset */
+}
+.userlist .site-spammed a{
+	color: #990000; /* red */
+}
+.site-spammed .view,.site-archived .view, .site-deleted .view,.site-mature .view {
+	background-color:#FECAC2;
+}
+/* ---------------------------------------- */
+/* filtering form styles - make a bit wider ?   LET THEME & ADMIN control it*/
+/*form#userlist label {
+	display: block;
+	clear: both;
+	float: left;
+	width: 200px;
+}*/
+
+form#userlist label {
+	font-weight: normal;
+}
+
+form#userlist  legend{
+	font-weight: bold;
+}
+
+form#userlist .perpage-box label {
+	width: auto;
+	
+}
+form#userlist .perpage-box  {
+	margin: 0 auto;	
+	width: 100%;
+}
+form#userlist th .date_range .ui-datepicker-trigger {
+	display: none;  /* save space in table */
+}
+/* for range input fields */
+form#userlist th fieldset label {
+	clear: both;
+	width: auto;
+}
+
+form#userlist th fieldset input {
+	float: right;
+}
+
+form#userlist input[type="number"] {
+	width: 50px;
+}
+form#userlist .number_range label {
+	clear: both;
+}
+
+
+/* ---------------------------------------- */
+#user_totals {
+	clear: both; float: right;
+}
+/* ---------------------------------------- */
+/* Custom navigation styles */
+#filter_buttons,
+#user_navigation,
+#alpha_navigation {
+	clear: both;
+	float: right;
+	padding: 5px 0px;
+}
+#filter_buttons,
+#user_navigation,
+#alpha_navigation {
+	width: 100%;
+	text-align: right;
+}
+#user_navigation .active a,
+#alpha_navigation .active a {
+	/* how to make active index stand out? */
+}
+/* ---------------------------------------- */
+/* Pagination styles */
+.tablenav {
+clear:both;
+padding: 3px;
+margin-bottom: 3px;
+background: #fff;
+border-radius:3px;  
+border-spacing:0;
+border-style:solid;
+border-width:1px;
+border-color: #fff;
+text-align: right;
+}
+.tablenav .tablenav-pages {
+color:#555555;
+}
+.tablenav .tablenav-pages a {
+	width: auto;
+}
+
+.tablenav .displaying-num {
+/*display:block; /* extra */
+font-style:italic;
+margin-right:10px;
+}
+
+.tablenav .tablenav-pages a {
+background:#EEEEEE;
+color: #666;
+/* border-color:#E3E3E3; */
+}
+
+.tablenav .tablenav-pages a, 
+.tablenav-pages span.current {
+border:1px solid;
+padding:3px 6px;
+text-decoration:none;
+}
+.tablenav .next, .tablenav .prev {
+border-color:transparent;
+/* color:#21759B; */
+}
+a.page-numbers {
+
+display: inline-block;	 /* Effing 2017 theme now hides the page-numbers - why!!!*/
+font-weight:bold;
+margin-right:1px;
+padding:0 2px;
+}
+.tablenav .tablenav-pages .current {
+background:#DFDFDF none;
+border-color:#D3D3D3;
+}
+.tablenav .dots {
+border-color:transparent;
+}
+.tablenav-pages br { 
+/* fix those annoying themes or other plugins that insist on adding wpautop filter to post shortcode content */
+	display: none
+}
+/*------------------------------ the widget */
+.widget-container table.userlist,
+.widget-container table.userlist tr ,
+.widget-container table.userlist td {
+	border: 0px;
+}
+.widget-container table.userlist td {
+	padding: 2px;
+}
+table.ui-datepicker-calendar {
+	background: #fff;
+}
+/*------------------------------ avatars */
+.avatar img {
+-moz-box-shadow:2px 2px 4px rgba(0, 0, 0, 0.5);
+-webkit-box-shadow:2px 2px 4px rgba(0, 0, 0, 0.5);
+box-shadow:2px 2px 4px rgba(0, 0, 0, 0.5);
+filter:filter: progid:DXImageTransform.Microsoft.Shadow(direction=135,strength=3, color=#808080);
+
+}
+/*------------------------------ headings, not in table */
+span.th {
+	margin-right: 2%;
+}
+/*------------------------------ avatar  not in table */
+span.avatar {
+	margin-right: 6px;
+}
+/*------------------------------ names, not in table */
+span.display_name {
+	font-weight:bold;
+	font-size: large;
+}
+/*------------------------------ not in table */
+span.user_registered a:hover {
+ color: red;
+  position: relative;	
+}
+span.user_registered a[title]:hover:after {
+  content: attr(title);
+  padding: 4px 8px;
+  color: #333;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  white-space: nowrap;
+  z-index: 20px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: 0px 0px 4px #222;
+  -webkit-box-shadow: 0px 0px 4px #222;
+  box-shadow: 0px 0px 4px #222;
+  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eeeeee),color-stop(1, #cccccc));
+  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+}
+
+span.amr-tooltip {
+	cursor: help;
+}
+
+form#userlist  .perpage-box  {
+	display: table-cell;
+	vertical-align: middle;
+	margin-bottom: 1em;
+}
+
+form#userlist .perpage-box #rows_per_page {	
+	display: inline;
+	width: 4em;
+	margin: 0 1em;
+}
+
+
+form#userlist .perpage-box  label {
+	display: inline;
+	float: none;
+}
+/* some themes have overflow hidden on containing css */
+#userslist1,
+#userslist2,
+#userslist3,
+#userslist4,
+#userslist5,
+#userslist6,
+#userslist7,
+#userslist8,
+#userslist9,
+#userslist10 {
+	overflow: auto;
+}

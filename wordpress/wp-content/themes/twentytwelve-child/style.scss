@@ -1,0 +1,352 @@
+/*
+Theme Name: Twenty Twelve Child
+Theme URI: https://wordpress.org/themes/twentytwelve-child/
+Template: twentytwelve
+Author: the WordPress team
+Author URI: https://lexfridman.com/
+Description: Lex version of Twenty Twelve theme.
+Version: 2.2
+    License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tags: custom
+Text Domain: twentytwelve-child
+
+test
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+*/
+
+/* =Notes
+--------------------------------------------------------------
+This stylesheet uses rem values with a pixel fallback. The rem
+values (and line heights) are calculated using two variables:
+
+$rembase:     14;
+$line-height: 24;
+
+---------- Examples
+
+* Use a pixel value with a rem fallback for font-size, padding, margins, etc.
+	padding: 5px 0;
+	padding: 0.357142857rem 0; (5 / $rembase)
+
+* Set a font-size and then set a line-height based on the font-size
+	font-size: 16px
+	font-size: 1.142857143rem; (16 / $rembase)
+	line-height: 1.5; ($line-height / 16)
+
+---------- Vertical spacing
+
+Vertical spacing between most elements should use 24px or 48px
+to maintain vertical rhythm:
+
+.my-new-div {
+	margin: 24px 0;
+	margin: 1.714285714rem 0; ( 24 / $rembase )
+}
+
+---------- Further reading
+
+http://snook.ca/archives/html_and_css/font-size-with-rem
+http://blog.typekit.com/2011/11/09/type-study-sizing-the-legible-letter/
+
+
+/* =Reset
+-------------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
+
+
+body {
+  color: #000000;
+  //color: #00FF00;
+}
+
+div#main {
+  max-width:700px;
+  margin: auto;
+  font-size: 16px;
+  color: #000000;
+  //color: #00FF00;
+}
+
+.site-header h1.site-title, .site-header h1.site-title a {
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 500;
+  font-size: 34px;
+  text-align: center;
+  color:#bbb;
+  body.page-id-2 & { color:#000; }
+  &:hover {color:#9ec4ff;}
+}
+
+h1#lex-page-title {
+  font-family: 'Ubuntu', sans-serif;
+  font-weight:normal;
+  text-align: center;
+  font-size:34px;
+}
+
+footer[role="contentinfo"] {
+  display:none;
+}
+.page .entry-title {
+  display:none;
+}
+.site-content {
+  margin-top:0px;
+  padding-top:0px;
+}
+.site-content article {
+  border-bottom:none;
+}
+img.size-full, img.size-large, img.header-image, img.wp-post-image, .entry-content img {
+  box-shadow:  none;
+}
+.wrapper {
+  padding-top: 0px;
+  margin-top: 0px;
+}
+.site-header {
+  padding-bottom: 0px;
+}
+.entry-content a:visited,
+.comment-content a:visited {
+  color: #21759b;
+}
+.entry-content a:hover,
+.comment-content a:hover {
+  color:#00b6ff;
+  text-decoration: none;
+}
+
+.clear { clear: both; }
+
+/************************** Page Specific Options ******************************/
+.page-id-353 .site-header,
+.page-id-1138 .site-header
+{
+  display:none;
+}
+
+/**************************** Menu ******************************/
+#site-navigation {
+  margin-top:18px; /* 24px originally */
+}
+
+.nav-menu li, .nav-menu li a {
+  text-transform: none;
+  //color: #000;
+  color: #888888;
+  font-size: 16px;
+}
+.main-navigation li#menu-item-78,
+.main-navigation li#menu-item-112,
+.main-navigation li#menu-item-111,
+.main-navigation li#menu-item-325,
+.main-navigation li#menu-item-339 {
+  //float:right;
+  //margin-left: 40px;
+  margin-right: 20px;
+  float:right;
+  a {
+    float:right;
+    font-size: 12px;
+    //line-height: 44px;
+    //width: 50px;
+    padding-top: 8px;
+  }
+}
+.main-navigation li#menu-item-78 {
+  margin-right: 0px;
+}
+
+/**************************** Home Page ******************************/
+.staff-list {
+  //padding-bottom: 20px;
+}
+.staff {
+  //width: 100px;
+  float:left;
+  padding-top:10px;
+  padding-bottom:10px;
+  //margin-right: 20px;
+  //padding-right: 50px;
+}
+.staff-thumb {
+  text-align: center;
+  margin: 0 30px;
+}
+.staff-lex .staff-thumb { text-align: left; }
+.staff-name { text-align: center; }
+.staff-title { text-align: center; }
+.guest-list-2017 {
+  /*display:block;
+  width:100%;*/
+  .guest {
+    /*width: 150px;*/
+    padding-bottom:20px;
+    /*display: block;*/
+    float:left;
+    width:100%;
+    clear: left;
+    display: block;
+  }
+  .guest-thumb {
+    width:100px;
+    padding-right: 10px;
+    float:left;
+    /*display: inline;*/
+  }
+  .guest-name { text-align: left; }
+  .guest-title {
+    font-size:12px;
+    color:#555;
+  }
+  .guest-topic {
+    font-weight:bold;
+  }
+}
+
+.guest-list-2018 {
+  padding-top: 20px;
+
+  .guest {
+    /*width: 150px;*/
+    padding-bottom:20px;
+    /*display: block;*/
+    float:left;
+    width:100%;
+    clear: left;
+    display: block;
+  }
+
+  .guest-logistics {
+    span { padding-right:15px; }
+    span.date-time { color:#bc0000; }
+    span.warning { color:#f00; font-size:12px;}
+  }
+
+  .guest-thumb {
+    width:100px;
+    padding-right: 10px;
+    float:left;
+    /*display: inline;*/
+  }
+  .guest-thumb-youtube {
+    //width:178px;
+    padding-right: 10px;
+    float:left;
+    /*display: inline;*/
+  }
+
+  .materials {
+    span.soon { font-size:12px; color:#666; padding-left: 10px; font-style: italic;}
+  }
+  .guest-name { text-align: left; }
+  .guest-title {
+    font-size:12px;
+    color:#555;
+  }
+  .guest-topic {
+    font-weight:bold;
+  }
+
+  .guest-pretopic {
+    font-weight: normal;
+    font-size: 14px;
+    font-style: italic;
+    color: #00ba27;
+  }
+}
+
+
+ul#topics li span {
+  font-weight: bold;
+}
+ul#topics li span.soon, span.soon {color:#c60000; font-weight:normal;}
+img.schedule { box-shadow:  none; }
+
+.entry-content h3 {
+  margin-bottom: 0px;
+  font-family: 'Raleway', sans-serif;
+  font-weight: normal;
+  font-size: 26px;
+
+}
+.entry-content p, .entry-content ul, .entry-content ol {
+  margin:10px 0;
+}
+div.shirt {
+  float:right;
+}
+
+/**************************** Posts ***************************/
+.type-post .entry-header .entry-title {
+  margin-top:20px;
+  font-size:28px;
+}
+footer.entry-meta {
+  display:none;
+}
+nav.nav-single {
+  display:none;
+}
+
+/****************** Profile Builder Forms ********************/
+#wppb-register-user li.wppb-send-credentials-checkbox {
+  display:none;
+}
+
+/****************** Ninja Forms ********************/
+.nf-field-label label {
+  color:#003d72;
+  font-size: 14px;
+}
+.label-above .nf-field-label {
+  margin-bottom: 0px !important;
+}
+.nf-field-description {
+  color:#000000;
+  font-size: 13px !important;
+  font-style: italic !important;
+}
+.nf-field-element {
+  color: #000000;
+  font-size: 13px;
+}
+
+/****************** General blog content formatting ********************/
+.entry-content {
+  blockquote {
+    font-family: "Open Sans", sans-serif;
+    font-size: 1.3em;
+    background: #f9f9f9;
+    border-left: 10px solid #ccc;
+    padding: 0 20px;
+    font-style: normal;
+    font-weight: 300;
+
+    .quote-cite { color:#990000; }
+    p {padding: 10px 0;}
+  }
+}
+
+
+/****************** Common Styling ********************/
+.error-label {
+  font-weight: bold;
+  color:#d90700;
+}
+
+.big-display, .size-x-large {
+  @media (min-width:960px) {
+    margin-left: -130px;
+    margin-right: -130px;
+    width:960px;
+    min-width:960px;
+  }
+}
