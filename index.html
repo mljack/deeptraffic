@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<!--[if IE 7]>
+<html class="ie ie7" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html class="ie ie8" lang="en-US">
+<![endif]-->
+<!--[if !(IE 7) & !(IE 8)]><!-->
+<html lang="en-US">
+<!--<![endif]-->
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="An introduction to deep learning through the applied task of building a self-driving car. Taught by Lex Fridman." />
+    <meta name="keywords" content="deep learning,lex fridman,self-driving cars,mit" />
+    <title>DeepTraffic | MIT 6.S094: Deep Learning for Self-Driving Cars</title>
+    <link rel="profile" href="http://gmpg.org/xfn/11" />
+    <link rel="pingback" href="https://selfdrivingcars.mit.edu/wordpress/xmlrpc.php" />
+        <!--[if lt IE 9]>
+    <script src="https://selfdrivingcars.mit.edu/wordpress/wp-content/themes/twentytwelve/js/html5.js" type="text/javascript"></script>
+    <![endif]-->
+    
+<!-- This site is optimized with the Yoast SEO plugin v7.7.3 - https://yoast.com/wordpress/plugins/seo/ -->
+<link rel="canonical" href="https://selfdrivingcars.mit.edu/deeptraffic/" />
+<script type='application/ld+json'>{"@context":"https:\/\/schema.org","@type":"Organization","url":"https:\/\/selfdrivingcars.mit.edu\/","sameAs":["https:\/\/www.facebook.com\/lexfridman","https:\/\/www.instagram.com\/lexfridman\/","https:\/\/www.linkedin.com\/in\/lexfridman\/","http:\/\/www.youtube.com\/lexfridman","https:\/\/twitter.com\/LexFridman"],"@id":"https:\/\/selfdrivingcars.mit.edu\/#organization","name":"MIT 6.S094: Deep Learning for Self-Driving Cars","logo":"http:\/\/selfdrivingcars.mit.edu\/wordpress\/wp-content\/uploads\/2017\/12\/share_image.png"}</script>
+<!-- / Yoast SEO plugin. -->
+
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel='dns-prefetch' href='//s.w.org' />
+<link href='https://fonts.gstatic.com' crossorigin rel='preconnect' />
+<link rel="alternate" type="application/rss+xml" title="MIT 6.S094: Deep Learning for Self-Driving Cars &raquo; Feed" href="https://selfdrivingcars.mit.edu/feed/" />
+<link rel="alternate" type="application/rss+xml" title="MIT 6.S094: Deep Learning for Self-Driving Cars &raquo; Comments Feed" href="https://selfdrivingcars.mit.edu/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.4\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.4\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/selfdrivingcars.mit.edu\/wordpress\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.9.7"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55357,56692,8205,9792,65039],[55357,56692,8203,9792,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='dashicons-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-includes/css/dashicons.min.css?ver=4.9.7' type='text/css' media='all' />
+<link rel='stylesheet' id='thickbox-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-includes/js/thickbox/thickbox.css?ver=4.9.7' type='text/css' media='all' />
+<link rel='stylesheet' id='wppb-cpm-style-frontend-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-content/plugins/pb-add-on-custom-profile-menus/assets/css/style-frontend.css?ver=1.0.6' type='text/css' media='all' />
+<link rel='stylesheet' id='wppb-mailchimp-integration-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-content/plugins/pb-add-on-mailchimp-integration/assets/css/style-front-end.css?ver=4.9.7' type='text/css' media='all' />
+<link rel='stylesheet' id='twentytwelve-style-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-content/themes/twentytwelve/style.css?ver=4.9.7' type='text/css' media='all' />
+<link rel='stylesheet' id='child-style-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-content/themes/twentytwelve-child/style.css?ver=2.2' type='text/css' media='all' />
+<link rel='stylesheet' id='twentytwelve-fonts-css'  href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700&#038;subset=latin,latin-ext' type='text/css' media='all' />
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentytwelve-ie-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-content/themes/twentytwelve/css/ie.css?ver=20121010' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='lgc-unsemantic-grid-responsive-tablet-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-content/plugins/lightweight-grid-columns/css/unsemantic-grid-responsive-tablet.css?ver=1.0' type='text/css' media='all' />
+<link rel='stylesheet' id='amrusers-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-content/plugins/amr-users/css/amrusersfront.css?ver=4.9.7' type='text/css' media='all' />
+<link rel='stylesheet' id='wppb_stylesheet-css'  href='https://selfdrivingcars.mit.edu/wordpress/wp-content/plugins/profile-builder-pro/assets/css/style-front-end.css?ver=2.7.1' type='text/css' media='all' />
+<script type='text/javascript' src='https://selfdrivingcars.mit.edu/wordpress/wp-includes/js/jquery/jquery.js?ver=1.12.4'></script>
+<script type='text/javascript' src='https://selfdrivingcars.mit.edu/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<script type='text/javascript' src='https://selfdrivingcars.mit.edu/wordpress/wp-content/plugins/pb-add-on-custom-profile-menus/assets/js/wppb_cpm_main.js?ver=1.0.6'></script>
+<link rel='https://api.w.org/' href='https://selfdrivingcars.mit.edu/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://selfdrivingcars.mit.edu/wordpress/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://selfdrivingcars.mit.edu/wordpress/wp-includes/wlwmanifest.xml" /> 
+<meta name="generator" content="WordPress 4.9.7" />
+<link rel='shortlink' href='https://selfdrivingcars.mit.edu/?p=2112' />
+<link rel="alternate" type="application/json+oembed" href="https://selfdrivingcars.mit.edu/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fselfdrivingcars.mit.edu%2Fdeeptraffic%2F" />
+<link rel="alternate" type="text/xml+oembed" href="https://selfdrivingcars.mit.edu/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fselfdrivingcars.mit.edu%2Fdeeptraffic%2F&#038;format=xml" />
+		<!--[if lt IE 9]>
+			<link rel="stylesheet" href="https://selfdrivingcars.mit.edu/wordpress/wp-content/plugins/lightweight-grid-columns/css/ie.min.css" />
+		<![endif]-->
+	
+
+<!-- Plugin: Open external links a new window. Plugin by Kristian Risager Larsen, http://kristianrisagerlarsen.dk . Download it at http://wordpress.org/extend/plugins/open-external-links-in-a-new-window/ -->
+<script type="text/javascript">//<![CDATA[
+	function external_links_in_new_windows_loop() {
+		if (!document.links) {
+			document.links = document.getElementsByTagName('a');
+		}
+		var change_link = false;
+		var force = '';
+		var ignore = '';
+
+		for (var t=0; t<document.links.length; t++) {
+			var all_links = document.links[t];
+			change_link = false;
+			
+			if(document.links[t].hasAttribute('onClick') == false) {
+				// forced if the address starts with http (or also https), but does not link to the current domain
+				if(all_links.href.search(/^http/) != -1 && all_links.href.search('selfdrivingcars.mit.edu') == -1) {
+					// alert('Changeda '+all_links.href);
+					change_link = true;
+				}
+					
+				if(force != '' && all_links.href.search(force) != -1) {
+					// forced
+					// alert('force '+all_links.href);
+					change_link = true;
+				}
+				
+				if(ignore != '' && all_links.href.search(ignore) != -1) {
+					// alert('ignore '+all_links.href);
+					// ignored
+					change_link = false;
+				}
+
+				if(change_link == true) {
+					// alert('Changed '+all_links.href);
+					document.links[t].setAttribute('onClick', 'javascript:window.open(\''+all_links.href+'\'); return false;');
+					document.links[t].removeAttribute('target');
+				}
+			}
+		}
+	}
+	
+	// Load
+	function external_links_in_new_windows_load(func)
+	{	
+		var oldonload = window.onload;
+		if (typeof window.onload != 'function'){
+			window.onload = func;
+		} else {
+			window.onload = function(){
+				oldonload();
+				func();
+			}
+		}
+	}
+
+	external_links_in_new_windows_load(external_links_in_new_windows_loop);
+	//]]></script>
+
+    <script>
+    function hasWKGoogleAnalyticsCookie() {
+      return (new RegExp('wp_wk_ga_untrack_' + document.location.hostname) ).test(document.cookie);
+    }
+    </script>
+    	<style type="text/css" id="twentytwelve-header-css">
+			.site-header h1 a,
+		.site-header h2 {
+			color: #0a0a0a;
+		}
+		</style>
+	<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #ffffff; }
+</style>
+        <script src="convnetjs/convnet.js?v2.0"></script>
+    <script src="convnetjs/util.js?v2.0"></script>
+    <script src="convnetjs/vis.js?v2.0"></script>
+    <script src="convnetjs/deepqlearn.js?v2.0"></script>
+    <script src="croppie/croppie.min.js"></script>
+    <link rel="stylesheet" href="croppie/croppie.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="skeleton_lex_modified.css" />
+    <link rel="stylesheet" href="deeptraffic_style.css" />    </head>
+
+<body class="page-template-default page page-id-2112 logged-in custom-background full-width custom-background-white custom-font-enabled">
+<div id="page" class="hfeed site">
+	<header id="masthead" class="site-header" role="banner">
+		<hgroup>
+			<h1 class="site-title"><a href="https://selfdrivingcars.mit.edu/" title="MIT 6.S094: Deep Learning for Self-Driving Cars" rel="home">MIT 6.S094: Deep Learning for Self-Driving Cars</a></h1>
+			<h2 class="site-description"></h2>
+		</hgroup>
+
+		<nav id="site-navigation" class="main-navigation" role="navigation">
+			<button class="menu-toggle">Menu</button>
+			<a class="assistive-text" href="#content" title="Skip to content">Skip to content</a>
+			<div class="menu-menu-1-container"><ul id="menu-menu-1" class="nav-menu"><li id="menu-item-35" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-35"><a href="https://selfdrivingcars.mit.edu/">Home</a></li>
+<li id="menu-item-327" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item menu-item-327"><a href="/deeptraffic">DeepTraffic</a></li>
+<li id="menu-item-2104" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2104"><a href="/deepcrash">DeepCrash</a></li>
+<li id="menu-item-2105" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2105"><a href="/segfuse">SegFuse</a></li>
+<li id="menu-item-326" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-326"><a href="/deeptesla">DeepTesla</a></li>
+<li id="menu-item-78" class="menu-item menu-item-type-wppb_cpm_login_logout menu-item-object-custom menu-item-78"><a href="https://selfdrivingcars.mit.edu/wordpress/wp-login.php?action=logout&#038;redirect_to=https%3A%2F%2Fselfdrivingcars.mit.edu%2Fdeeptraffic%2F%3Fwppb_cpm_redirect%3Dyes&#038;_wpnonce=f9ea86bdfe">Logout</a></li>
+<li id="menu-item-111" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-111"><a href="https://selfdrivingcars.mit.edu/edit-profile/">Edit Profile</a></li>
+<li id="menu-item-325" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-325"><a href="https://selfdrivingcars.mit.edu/profile/">View Profile</a></li>
+<li id="menu-item-339" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-339"><a href="https://selfdrivingcars.mit.edu/resources/">Resources</a></li>
+</ul></div>		</nav><!-- #site-navigation -->
+
+			</header><!-- #masthead -->
+
+	<div id="main" class="wrapper"><img id="whiteCarSmall" src="car-white-small.png" style="display: none;">
+<img id="redCarSmall" src="car-red-small.png" style="display: none;">
+<div class="mainContainer">
+  <div class="infoCol">
+    <div class="speedBox">
+      Speed: <br>
+      <span style="font-size:16pt;" id="mph">0</span> mph<br> Cars Passed: <br>
+      <span style="font-size:16pt;" id="passed">0</span>
+    </div>
+  </div>
+  <div class="gameCol">
+    <canvas id="canvas" width="400" height="1400"></canvas>
+    <br>
+    <div style="text-align: center">
+      <span>Road Overlay:</span>
+      <br>
+      <select class="button-small" onchange="setDrawingStyle(this)">
+        <option value="normal">None</option>
+        <option value="cutout">Learning Input</option>
+        <option value="safety">Safety System</option>
+        <option value="full">Full Map</option>
+      </select><br>
+      <span>Simulation Speed:</span>
+      <br>
+      <select class="button-small" onchange="setFast(this.value == 'true')">
+        <option value="false">Normal</option>
+        <option value="true">Fast</option>
+      </select>
+    </div>
+  </div>
+  <div class="codeCol">
+    <div class="headline">
+      <h1 style="margin-bottom:10px;">Deep<span style="color:dodgerblue">Traffic</span></h1>
+      <!--            <a style="color: inherit;" href="/">Main Page</a>-->
+      <a href="/deeptraffic-visualization" target="_blank">Visualization</a>
+      - <a href="/deeptraffic-leaderboard" target="_blank">Leaderboard</a>
+      - <a href="/deeptraffic-about" target="_blank">About DeepTraffic</a>
+      <p>Americans spend 8 billion hours stuck in traffic every year.<br>Deep neural networks can help!</p>
+    </div>
+    <div id="container" class="codeBox" style="border:1px solid grey;display:inline-block; vertical-align: top;"></div>
+    <div style="margin-top:10px;">
+      <button class="button-small" onclick="run()">Apply Code/Reset Net</button>
+      <button id="downloadCodeButton" class="button-small">Save Code/Net to File</button>
+      <a id="blobDownload" style="display:none"></a>
+      <label for="filePicker" class="button button-small">Load Code/Net from File</label>
+      <input type="file" id="filePicker" onchange="readFile(this)" style="display: none;">
+      <button class="button-small" onclick="submitNet()">Submit Model to Competition</button>
+    </div>
+    <div>
+      <div id="vehicle-div">
+        <div id="croppie-container" style="display:none"></div>
+        <div>
+          <img id="vehicle" src=car-red.png>
+        </div>
+        <div>
+          <button id="cropImage" class="button-primary button-small" style="display:none">cropImage</button>
+          <button id="loadFile" class="button-small">Load Custom Image</button>
+          <div>
+            <select id="colorscheme" name="colors" class="button-small">
+              <option id="red" value="#FF0000">Red</option>
+              <option id="maroon" value="#800000">Maroon</option>
+              <option id="black" value="#000000">Black</option>
+              <option id="silver" value="#C0C0C0">Sliver</option>
+              <option id="yellow" value="#FFFF00">Yellow</option>
+              <option id="lime" value="#00FF00">Lime</option>
+              <option id="green" value="#008000">Green</option>
+              <option id="aqua" value="#00FFFF">Aqua</option>
+              <option id="teal" value="#008080">Teal</option>
+              <option id="blue" value="#0000FF">Blue</option>
+              <option id="navy" value="#0000F0">Navy</option>
+              <option id="fuchsia" value="#FF00FF">Fuchsia</option>
+              <option id="purple" value="#800080">Purple</option>
+            </select>
+          </div>
+          <div>
+            <button id="requestVisualization" class="button-small">Request Visualization</button>
+          </div>
+        </div>
+        <div class="example-links">
+          <a href="https://selfdrivingcars.mit.edu/deeptraffic-custom-car-gallery/" target="_blank">Custom Vehicle Images</a>
+          <a href="https://selfdrivingcars.mit.edu/deeptraffic-visualization/" target="_blank">See Your Visualization</a>
+        </div>
+      </div>
+
+      <div>
+        <canvas id="graph_canvas" width="350" height="120"></canvas>
+        <br/>
+        <div style="margin-bottom:10px;">
+          <button id="trainButton" class="button-small button-primary" onclick="train()">Run Training</button>
+          <progress id="trainProgress" style="display: none;" value="0" max="100"></progress>
+          <button id="evalButton" class="button-small button-primary" onclick="startEvalRun()">Start Evaluation Run
+          </button>
+          <progress id="evalProgress" style="display: none;" value="0" max="100"></progress>
+        </div>
+        <div style="overflow: auto; width:449px;">
+          <canvas id="net_canvas" width="550" height="200"></canvas>
+          <br/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>
+    DeepTraffic is a deep reinforcement learning competition. The goal is to create a neural network to drive a vehicle (or multiple vehicles) as fast as possible through dense highway traffic. What you see above is all you need to succeed in this competition. Here are the basic steps (<a href="/deeptraffic-about/">more details here</a>):
+</p>
+
+<ol>
+    <li>Change parameters in the code box (<a href="/deeptraffic-about/">hints here</a>).</li>
+    <li>Click "Apply Code" white button.</li>
+    <li>Click "Run Training" blue button.</li>
+    <li>Click "Submit Model to Competition".</li>
+</ol>
+
+<p>
+    In version 2.0, you can create visualizations of your best submission (Under Development):
+</p>
+
+<ol>
+    <li>Customize your image vehicle (Load Custom Image).</li>
+    <li>Customize your color scheme (drop down).</li>
+    <li>Click "Request Visualization".</li>
+</ol>
+
+
+<script src="convnetjs/helperStuff.js"></script>
+<script id="sampleCode" type="text/javascript">
+//<![CDATA[
+
+// a few things don't have var in front of them - they update already existing variables the game needs
+lanesSide = 0;
+patchesAhead = 1;
+patchesBehind = 0;
+trainIterations = 10000;
+
+// the number of other autonomous vehicles controlled by your network
+otherAgents = 0; // max of 10
+
+var num_inputs = (lanesSide * 2 + 1) * (patchesAhead + patchesBehind);
+var num_actions = 5;
+var temporal_window = 3;
+var network_size = num_inputs * temporal_window + num_actions * temporal_window + num_inputs;
+
+var layer_defs = [];
+    layer_defs.push({
+    type: 'input',
+    out_sx: 1,
+    out_sy: 1,
+    out_depth: network_size
+});
+layer_defs.push({
+    type: 'fc',
+    num_neurons: 1,
+    activation: 'relu'
+});
+layer_defs.push({
+    type: 'regression',
+    num_neurons: num_actions
+});
+
+var tdtrainer_options = {
+    learning_rate: 0.001,
+    momentum: 0.0,
+    batch_size: 64,
+    l2_decay: 0.01
+};
+
+var opt = {};
+opt.temporal_window = temporal_window;
+opt.experience_size = 3000;
+opt.start_learn_threshold = 500;
+opt.gamma = 0.7;
+opt.learning_steps_total = 10000;
+opt.learning_steps_burnin = 1000;
+opt.epsilon_min = 0.0;
+opt.epsilon_test_time = 0.0;
+opt.layer_defs = layer_defs;
+opt.tdtrainer_options = tdtrainer_options;
+
+brain = new deepqlearn.Brain(num_inputs, num_actions, opt);
+
+learn = function (state, lastReward) {
+brain.backward(lastReward);
+var action = brain.forward(state);
+
+draw_net();
+draw_stats();
+
+return action;
+}
+
+//]]>
+</script>
+<script src="gameopt.js?v2.01"></script>
+<script src="monaco-editor/min/vs/loader.js"></script>
+<script src="site.js?v2.02"></script>
+
+<input type="file" id="inputCarToLoad" accept=".png" style="display: none;">
+<script src="image_uploader.js?v2.01"></script>
+
+
+	</div><!-- #main .wrapper -->
+	<footer id="colophon" role="contentinfo">
+		<div class="site-info">
+						<a href="https://wordpress.org/" title="Semantic Personal Publishing Platform">Proudly powered by WordPress</a>
+		</div><!-- .site-info -->
+	</footer><!-- #colophon -->
+</div><!-- #page -->
+
+<script type='text/javascript'>
+/* <![CDATA[ */
+var thickboxL10n = {"next":"Next >","prev":"< Prev","image":"Image","of":"of","close":"Close","noiframes":"This feature requires inline frames. You have iframes disabled or your browser does not support them.","loadingAnimation":"https:\/\/selfdrivingcars.mit.edu\/wordpress\/wp-includes\/js\/thickbox\/loadingAnimation.gif"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://selfdrivingcars.mit.edu/wordpress/wp-includes/js/thickbox/thickbox.js?ver=3.1-20121105'></script>
+<script type='text/javascript' src='https://selfdrivingcars.mit.edu/wordpress/wp-content/themes/twentytwelve/js/navigation.js?ver=20140711'></script>
+<script type='text/javascript' src='https://selfdrivingcars.mit.edu/wordpress/wp-includes/js/wp-embed.min.js?ver=4.9.7'></script>
+</body>
+</html>
