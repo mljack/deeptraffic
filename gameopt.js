@@ -99,8 +99,8 @@ function Vehicle() {
     this.y = this.x = 0;
     this.a = this.c = 1;
     this.b = 0;
-    this.h = Array(60);
-    this.j = function() {
+    this.speedHistory = Array(60);
+    this.update = function() {
         var a = Math.floor(140 * q(v) / 20);
         this.x = 20 * a + 4;
         switch (a) {
@@ -137,33 +137,48 @@ function Vehicle() {
         this.b = a
     }
     ;
-    this.j();
+    this.update();
     this.y = 10 * Math.floor(700 * Math.random() / 10);
     this.move = function(a) {
         var b = this.y - (this.c * this.a - E);
-        a && 525 > this.y && 525 <= b ? (F++,
-        headless || (document.getElementById("passed").innerText = F)) : a && 525 < this.y && 525 >= b && (F--,
-        headless || (document.getElementById("passed").innerText = F));
+        if (a && 525 > this.y && 525 <= b) {
+            passed++;
+            if (!headless) {
+                document.getElementById("passed").innerText = passed;
+            }
+        }
+        else if (a && 525 < this.y && 525 >= b) {
+            passed--;
+            if (!headless) {
+                document.getElementById("passed").innerText = passed;
+            }
+        }
         this.y = b;
-        this.h[G % this.h.length] = this.c * this.a * 20;
+        this.speedHistory[gFrameCount % this.speedHistory.length] = this.c * this.a * 20;
         a = 20 * this.b + 4 - this.x;
         this.x = Math.abs(a) < 20 / 30 ? 20 * this.b + 4 : 0 < a ? this.x + 20 / 30 : this.x - 20 / 30;
-        0 > this.y + 68 && (this.y = 734,
-        this.j());
-        700 < this.y - 68 && (this.y = -34,
-        this.j())
+        
+        // looping the road for NPC vehicles
+        if (0 > this.y + 68) {
+            this.y = 734;
+            this.update();
+        }
+        if (700 < this.y - 68) {
+            this.y = -34;
+            this.update();
+        }
     }
     ;
     this.f = !1;
     this.l = function() {
         for (var a = 0; 15 > a; a += 10)
             for (var b = 0; 34 > b; b += 5)
-                H.set((this.x + a) / 20, (this.y + b) / 10, 1 * this.c * this.a)
+                fullMap.set((this.x + a) / 20, (this.y + b) / 10, 1 * this.c * this.a)
     }
     ;
     this.u = function() {
         for (var a = 2, b = 1; 5 > b; b++) {
-            var d = H.get((this.x + 7.5) / 20, (this.y - 10 * b) / 10, 100);
+            var d = fullMap.get((this.x + 7.5) / 20, (this.y - 10 * b) / 10, 100);
             100 > d && (a = Math.min(a, .5 * (b - 1)),
             a = Math.min(a, d / this.a))
         }
@@ -172,29 +187,35 @@ function Vehicle() {
     ;
     this.i = function(a) {
         for (var b = (this.x + 7.5) / 20 + a, d = this.y / 10, c = .5 > Math.abs(this.x - (20 * this.b + 4)), f = 3 * -this.a; 4 > f; f++)
-            c = c && 100 <= H.get(b, d + f, 0);
+            c = c && 100 <= fullMap.get(b, d + f, 0);
         c && (this.b += a);
         return c
     }
     ;
-    this.v = function() {
+    this.updateSafety = function() {
+        // accelerate
         for (var a = !0, b = 1; 5 > b; b++)
-            a = a && 100 <= H.get((this.x + 7.5) / 20, (this.y - 10 * b) / 10, a ? 0 : 2);
+            a = a && 100 <= fullMap.get((this.x + 7.5) / 20, (this.y - 10 * b) / 10, a ? 0 : 2);
         for (b = 1; 5 > b; b++)
-            I.set((this.x + 7.5) / 20, (this.y - 10 * b) / 10, a ? 0 : 2);
-        b = (this.x + 7.5) / 20 + -1;
+            safety.set((this.x + 7.5) / 20, (this.y - 10 * b) / 10, a ? 0 : 2);
+            
         var d = this.y / 10;
+
+        // turn left
+        b = (this.x + 7.5) / 20 + -1;
         a = .5 > Math.abs(this.x - (20 * this.b + 4));
         for (var c = 3 * -this.a; 4 > c; c++)
-            a = a && 100 <= H.get(b, d + c, 0);
+            a = a && 100 <= fullMap.get(b, d + c, 0);
         for (c = 3 * -this.a; 4 > c; c++)
-            I.set(b, d + c, a ? 0 : 2);
+            safety.set(b, d + c, a ? 0 : 2);
+
+        // turn right
         b = (this.x + 7.5) / 20 + 1;
         a = .5 > Math.abs(this.x - (20 * this.b + 4));
         for (c = 3 * -this.a; 4 > c; c++)
-            a = a && 100 <= H.get(b, d + c, 0);
+            a = a && 100 <= fullMap.get(b, d + c, 0);
         for (c = 3 * -this.a; 4 > c; c++)
-            I.set(b, d + c, a ? 0 : 2)
+            safety.set(b, d + c, a ? 0 : 2)
     }
     ;
     this.m = function(a) {
@@ -213,21 +234,21 @@ function Vehicle() {
         }
     }
     ;
-    this.w = function() {
-        for (var a = 0, b = 0; b < this.h.length; b++)
-            a += this.h[b];
-        return Math.floor(a / this.h.length)
+    this.getRecentAvgSpeed = function() {
+        for (var a = 0, b = 0; b < this.speedHistory.length; b++)
+            a += this.speedHistory[b];
+        return Math.floor(a / this.speedHistory.length)
     }
 }
-for (var H = new Map(7,70,100), I = new Map(7,70,100), input = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0), C = 0, vehicles = [], L = 0; 20 > L; L++)
+for (var fullMap = new Map(7,70,100), safety = new Map(7,70,100), input = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0), C = 0, vehicles = [], L = 0; 20 > L; L++)
     vehicles.push(new Vehicle);
 var brains = y()
-  , G = 0
+  , gFrameCount = 0
   , E = 1.5
   , M = 0
   , N = 0
   , J = 0
-  , F = 0
+  , passed = 0
   , Q = !1;
 initializeMap = function(a) {
     function b(b) {
@@ -272,8 +293,8 @@ reset = function() {
     nOtherAgents != Math.min(otherAgents, 10) && (nOtherAgents = Math.min(otherAgents, 10),
     brains = y(),
     w = !1);
-    H = new Map(7,70,100);
-    I = new Map(7,70,100);
+    fullMap = new Map(7,70,100);
+    safety = new Map(7,70,100);
     input = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0);
     vehicles = [];
     for (var a = 0; 20 > a; a++)
@@ -284,9 +305,9 @@ reset = function() {
     u = new p(r);
     v = new p(r);
     initializeMap(u);
-    G = 0;
+    gFrameCount = 0;
     E = 1.5;
-    F = J = N = M = 0
+    passed = J = N = M = 0
 }
 ;
 setFast = function(a) {
@@ -379,15 +400,15 @@ function draw() {
         for (b = 0; 36 > b; b++)
             canvas.fillRect(20 * c, 20 * b + 2 + M - 10, 2, 8);
     if (showFullMap)
-        for (c = 0; c < H.data.length; c++)
-            for (b = 0; b < H.data[c].length; b++)
-                d = H.get(c, b, 0),
+        for (c = 0; c < fullMap.data.length; c++)
+            for (b = 0; b < fullMap.data[c].length; b++)
+                d = fullMap.get(c, b, 0),
                 canvas.fillStyle = 0 < d ? "rgba(250,120,0," + d / 100 + ")" : "rgba(0,120,250," + -d / 100 + ")",
                 canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8);
     if (showSafetySystem)
-        for (c = 0; c < H.data.length; c++)
-            for (b = 0; b < H.data[c].length; b++)
-                d = I.get(c, b, 100),
+        for (c = 0; c < fullMap.data.length; c++)
+            for (b = 0; b < fullMap.data[c].length; b++)
+                d = safety.get(c, b, 100),
                 0 == d ? (canvas.fillStyle = "rgba(250,120,0,0.5)",
                 canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8)) : 2 == d && (canvas.fillStyle = "rgba(250,0,0,0.5)",
                 canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8));
@@ -403,7 +424,7 @@ function draw() {
 function V() {
     !w && void 0 !== brain.forward_passes && brain.forward_passes > brain.temporal_window && (brains = y(),
     w = !0);
-    H.reset();
+    fullMap.reset();
     for (var a = 0; a < vehicles.length; a++)
         vehicles[a].move(0 != a, a),
         vehicles[a].l();
@@ -415,9 +436,9 @@ function V() {
             vehicles[a].i(b)
         }
     for (a = 1; a <= nOtherAgents; a++) {
-        if (G % 30 == 3 * a) {
+        if (gFrameCount % 30 == 3 * a) {
             var d = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0);
-            H.o(a, d);
+            fullMap.o(a, d);
             eval(A(a));
             d = tmpLearn(d.s());
             d = 0 <= d && d < n.length ? d : J
@@ -425,19 +446,24 @@ function V() {
         vehicles[a].m(d)
     }
     vehicles[0].l();
-    showSafetySystem && (I.reset(),
-    vehicles[0].v());
+    showSafetySystem && (safety.reset(),
+    vehicles[0].updateSafety());
     N += vehicles[0].c * vehicles[0].a;
-    0 == G % 30 && (H.o(0, input),
+    0 == gFrameCount % 30 && (fullMap.o(0, input),
     d = learn(input.s(), (N - 60) / 20),
     d = 0 <= d && d < n.length ? d : J,
     N = 0);
     vehicles[0].m(d);
-    G++;
-    0 == G % 1E4 && console.log(G);
-    headless || (G % 30 && (a = vehicles[0].w(),
-    isNaN(a) || (document.getElementById("mph").innerText = Math.max(0, a))),
-    draw())
+    gFrameCount++;
+    0 == gFrameCount % 1E4 && console.log(gFrameCount);
+    if (!headless) {
+        if (gFrameCount % 30) {
+            a = vehicles[0].getRecentAvgSpeed();
+            if (!isNaN(a))
+                document.getElementById("mph").innerText = Math.max(0, a);
+            draw();
+        }
+    }
 }
 evalRun = !1;
 doEvalRun = function(a, b, d, c, f) {
