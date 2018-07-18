@@ -1,7 +1,7 @@
 var ghostColor = "undefined" != typeof colorScheme && null != colorScheme ? colorScheme : "#FF0000"
-  , e = !1
-  , k = !1
-  , m = !1;
+  , showFullMap = !1
+  , showSafetySystem = !1
+  , showInput = !1;
 "undefined" == typeof headless && (headless = !1);
 var n = [0, 1, 2, 3, 4];
 function p(a) {
@@ -34,7 +34,7 @@ function x(a) {
 }
 function y() {
     var a = nOtherAgents
-      , b = z;
+      , b = vehicles;
     console.log("cloning");
     for (var d = [], c = 0; c < a; c++)
         d.push(x(brain));
@@ -82,10 +82,10 @@ function Map(a, b, d) {
         var c = lanesSide
           , d = patchesAhead
           , f = patchesBehind;
-        0 == a && (C = z[0].b);
+        0 == a && (C = vehicles[0].b);
         for (var g = -c; g <= c; g++)
             for (var h = -d; h < f; h++)
-                b.data[g + c][h + d] = this.get(z[a].b + g, Math.floor(z[a].y) / 10 + h, 0)
+                b.data[g + c][h + d] = this.get(vehicles[a].b + g, Math.floor(vehicles[a].y) / 10 + h, 0)
     }
     ;
     this.s = function() {
@@ -95,7 +95,7 @@ function Map(a, b, d) {
         return a
     }
 }
-function D() {
+function Vehicle() {
     this.y = this.x = 0;
     this.a = this.c = 1;
     this.b = 0;
@@ -219,8 +219,8 @@ function D() {
         return Math.floor(a / this.h.length)
     }
 }
-for (var H = new Map(7,70,100), I = new Map(7,70,100), K = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0), C = 0, z = [], L = 0; 20 > L; L++)
-    z.push(new D);
+for (var H = new Map(7,70,100), I = new Map(7,70,100), input = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0), C = 0, vehicles = [], L = 0; 20 > L; L++)
+    vehicles.push(new Vehicle);
 var brains = y()
   , G = 0
   , E = 1.5
@@ -241,31 +241,31 @@ initializeMap = function(a) {
             d += 1;
         return c
     }
-    z[0].y = 525;
-    z[0].x = 64;
-    z[0].b = 3;
+    vehicles[0].y = 525;
+    vehicles[0].x = 64;
+    vehicles[0].b = 3;
     legalLocations = Array(490).fill().map(function(a, b) {
         return b
     });
-    var c = Math.floor(z[0].x / 20)
-      , f = Math.floor(z[0].y / 10 + 4)
+    var c = Math.floor(vehicles[0].x / 20)
+      , f = Math.floor(vehicles[0].y / 10 + 4)
       , l = d(c, f);
-    z[0].a = 2;
+    vehicles[0].a = 2;
     for (var h = 0; h < l.length; h++)
         legalLocations.splice(legalLocations.indexOf(l[h]), 1);
-    for (var g = 1; g < z.length; g++) {
+    for (var g = 1; g < vehicles.length; g++) {
         c = b(legalLocations);
         f = Math.floor(c / 7);
         c %= 7;
         l = d(c, f);
         for (h = 0; h < l.length; h++)
             legalLocations.splice(legalLocations.indexOf(l[h]), 1);
-        z[g].x = Math.floor(20 * c + 4);
-        z[g].y = Math.floor(f / 70 * 700);
-        z[g].b = c;
-        z[g].f && (z[g].a = 1.7)
+        vehicles[g].x = Math.floor(20 * c + 4);
+        vehicles[g].y = Math.floor(f / 70 * 700);
+        vehicles[g].b = c;
+        vehicles[g].f && (vehicles[g].a = 1.7)
     }
-    z[0].a = 2
+    vehicles[0].a = 2
 }
 ;
 reset = function() {
@@ -274,11 +274,11 @@ reset = function() {
     w = !1);
     H = new Map(7,70,100);
     I = new Map(7,70,100);
-    K = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0);
-    z = [];
+    input = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0);
+    vehicles = [];
     for (var a = 0; 20 > a; a++)
-        z.push(new D),
-        a < nOtherAgents + 1 && (z[a].f = !0);
+        vehicles.push(new Vehicle),
+        a < nOtherAgents + 1 && (vehicles[a].f = !0);
     r += 1;
     t += 1;
     u = new p(r);
@@ -323,94 +323,96 @@ document.addEventListener("keydown", function(a) {
     R(a, !0)
 }));
 setDrawingStyle = function(a) {
-    m = k = e = !1;
+    showInput = showSafetySystem = showFullMap = !1;
     switch (a.value) {
     case "cutout":
-        m = !0;
+        showInput = !0;
         break;
     case "safety":
-        k = !0;
+        showSafetySystem = !0;
         break;
     case "full":
-        e = !0
+        showFullMap = !0
     }
 }
 ;
 var S = Array(100)
   , T = null;
-function U() {
-    var a = document.getElementById("canvas").getContext("2d");
-    a.globalCompositeOperation = "destination-over";
-    a.clearRect(-30, 0, 1E3, 1E3);
-    for (var b = document.getElementById("vehicle"), d = document.getElementById("whiteCarSmall"), c = 1; c < nOtherAgents + 1; c++)
-        a.drawImage(b, z[c].x, z[c].y, 15, 34);
-    for (c = nOtherAgents + 1; c < z.length; c++)
-        a.drawImage(d, z[c].x, z[c].y, 15, 34);
-    a.drawImage(b, z[0].x, z[0].y, 15, 34);
+function draw() {
+    var canvas = document.getElementById("canvas").getContext("2d");
+    canvas.globalCompositeOperation = "destination-over";
+    canvas.clearRect(-30, 0, 1E3, 1E3);
+    var imgV = document.getElementById("vehicle");
+    var imgNPC = document.getElementById("whiteCarSmall");
+    for (c = 1; c < nOtherAgents + 1; c++)
+        canvas.drawImage(imgV, vehicles[c].x, vehicles[c].y, 15, 34);
+    for (c = nOtherAgents + 1; c < vehicles.length; c++)
+        canvas.drawImage(imgNPC, vehicles[c].x, vehicles[c].y, 15, 34);
+    canvas.drawImage(imgV, vehicles[0].x, vehicles[0].y, 15, 34);
     if (null !== T) {
         for (b = S.length - 1; 0 <= b; b--) {
             d = (b + T) % S.length;
             if (void 0 === S[d])
                 break;
-            S[d].y += z[0].c;
+            S[d].y += vehicles[0].c;
             d = S[d];
-            a.globalAlpha = Math.min(.1, Math.pow(b / S.length, 5));
-            0 == b % 1 && (a.beginPath(),
-            a.arc(d.x + 7.5, d.y + 20, 5, 0, 2 * Math.PI, !1),
-            a.fillStyle = ghostColor,
-            a.fill())
+            canvas.globalAlpha = Math.min(.1, Math.pow(b / S.length, 5));
+            0 == b % 1 && (canvas.beginPath(),
+            canvas.arc(d.x + 7.5, d.y + 20, 5, 0, 2 * Math.PI, !1),
+            canvas.fillStyle = ghostColor,
+            canvas.fill())
         }
         T = (T + 1) % S.length
     } else
         T = 0;
     S[T] = {
-        x: z[0].x,
-        y: z[0].y
+        x: vehicles[0].x,
+        y: vehicles[0].y
     };
-    a.globalAlpha = 1;
-    a.fillStyle = "rgba(120,120,120,0.4)";
-    a.fillRect(140, 0, 2, 1E3);
-    a.fillRect(1, 0, 2, 1E3);
+    canvas.globalAlpha = 1;
+    canvas.fillStyle = "rgba(120,120,120,0.4)";
+    canvas.fillRect(140, 0, 2, 1E3);
+    canvas.fillRect(1, 0, 2, 1E3);
     M += E;
     M %= 20;
     for (c = 1; 7 > c; c++)
         for (b = 0; 36 > b; b++)
-            a.fillRect(20 * c, 20 * b + 2 + M - 10, 2, 8);
-    if (e)
+            canvas.fillRect(20 * c, 20 * b + 2 + M - 10, 2, 8);
+    if (showFullMap)
         for (c = 0; c < H.data.length; c++)
             for (b = 0; b < H.data[c].length; b++)
                 d = H.get(c, b, 0),
-                a.fillStyle = 0 < d ? "rgba(250,120,0," + d / 100 + ")" : "rgba(0,120,250," + -d / 100 + ")",
-                a.fillRect(20 * c + 2, 10 * b + 2, 18, 8);
-    if (k)
+                canvas.fillStyle = 0 < d ? "rgba(250,120,0," + d / 100 + ")" : "rgba(0,120,250," + -d / 100 + ")",
+                canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8);
+    if (showSafetySystem)
         for (c = 0; c < H.data.length; c++)
             for (b = 0; b < H.data[c].length; b++)
                 d = I.get(c, b, 100),
-                0 == d ? (a.fillStyle = "rgba(250,120,0,0.5)",
-                a.fillRect(20 * c + 2, 10 * b + 2, 18, 8)) : 2 == d && (a.fillStyle = "rgba(250,0,0,0.5)",
-                a.fillRect(20 * c + 2, 10 * b + 2, 18, 8));
-    if (m)
+                0 == d ? (canvas.fillStyle = "rgba(250,120,0,0.5)",
+                canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8)) : 2 == d && (canvas.fillStyle = "rgba(250,0,0,0.5)",
+                canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8));
+    if (showInput)
         for (c = -lanesSide; c <= lanesSide; c++)
             for (b = -patchesAhead; b < patchesBehind; b++)
-                d = K.get(c + lanesSide, b + patchesAhead, 0),
-                a.fillStyle = 100 < d ? "rgba(120,250,120," + (d / 10 / 103 + .1) + ")" : 0 < d ? "rgba(250,120,0," + (d / 101 + .1) + ")" : "rgba(0,120,250," + (-d / 101 + .1) + ")",
-                a.fillRect(20 * Math.floor(C + c) + 2, 10 * Math.floor(52.5 + b) + 2, 18, 8);
-    a.save();
-    a.restore()
+                d = input.get(c + lanesSide, b + patchesAhead, 0),
+                canvas.fillStyle = 100 < d ? "rgba(120,250,120," + (d / 10 / 103 + .1) + ")" : 0 < d ? "rgba(250,120,0," + (d / 101 + .1) + ")" : "rgba(0,120,250," + (-d / 101 + .1) + ")",
+                canvas.fillRect(20 * Math.floor(C + c) + 2, 10 * Math.floor(52.5 + b) + 2, 18, 8);
+    canvas.save();
+    canvas.restore()
 }
 function V() {
     !w && void 0 !== brain.forward_passes && brain.forward_passes > brain.temporal_window && (brains = y(),
     w = !0);
     H.reset();
-    for (var a = 0; a < z.length; a++)
-        z[a].move(0 != a, a),
-        z[a].l();
-    E = 1.5 - (z[0].y - 525);
-    for (a = 0; a < z.length; a++)
-        if (z[a].u(),
-        a > nOtherAgents && q(v) > .99 + .004 * z[a].c) {
+    for (var a = 0; a < vehicles.length; a++)
+        vehicles[a].move(0 != a, a),
+        vehicles[a].l();
+    E = 1.5 - (vehicles[0].y - 525);
+    for (a = 0; a < vehicles.length; a++)
+        if (vehicles[a].u(),
+        a > nOtherAgents && q(v) > .99 + .004 * vehicles[a].c) {
             var b = .5 < q(v) ? -1 : 1;
-            z[a].i(b)
+            vehicles[a].i(b)
         }
     for (a = 1; a <= nOtherAgents; a++) {
         if (G % 30 == 3 * a) {
@@ -420,22 +422,22 @@ function V() {
             d = tmpLearn(d.s());
             d = 0 <= d && d < n.length ? d : J
         }
-        z[a].m(d)
+        vehicles[a].m(d)
     }
-    z[0].l();
-    k && (I.reset(),
-    z[0].v());
-    N += z[0].c * z[0].a;
-    0 == G % 30 && (H.o(0, K),
-    d = learn(K.s(), (N - 60) / 20),
+    vehicles[0].l();
+    showSafetySystem && (I.reset(),
+    vehicles[0].v());
+    N += vehicles[0].c * vehicles[0].a;
+    0 == G % 30 && (H.o(0, input),
+    d = learn(input.s(), (N - 60) / 20),
     d = 0 <= d && d < n.length ? d : J,
     N = 0);
-    z[0].m(d);
+    vehicles[0].m(d);
     G++;
     0 == G % 1E4 && console.log(G);
-    headless || (G % 30 && (a = z[0].w(),
+    headless || (G % 30 && (a = vehicles[0].w(),
     isNaN(a) || (document.getElementById("mph").innerText = Math.max(0, a))),
-    U())
+    draw())
 }
 evalRun = !1;
 doEvalRun = function(a, b, d, c, f) {
@@ -464,7 +466,7 @@ doEvalRun = function(a, b, d, c, f) {
             0 == h % d && c();
             V();
             for (var B = 0; B < nOtherAgents + 1; B++)
-                O += Math.max(0, z[B].c * z[B].a) / (nOtherAgents + 1);
+                O += Math.max(0, vehicles[B].c * vehicles[B].a) / (nOtherAgents + 1);
             h++
         }
         f.push(Math.floor(O / b * 2E3) / 100)
