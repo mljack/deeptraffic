@@ -165,7 +165,10 @@ function Vehicle() {
                 document.getElementById("passed").innerText = passed;
             }
         }
-        
+        if (!headless) {
+            document.getElementById("frame").innerText = gFrameCount;
+        }
+    
         this.y = newY;
         this.speedHistory[gFrameCount % this.speedHistory.length] = this.followingSpeed * this.speedFactor * 20;
 
@@ -257,10 +260,12 @@ function Vehicle() {
                 this.speedFactor -= 0.02;
             break;
         case 3:
-            (a = this.turn(-1)) && (manualAction = 0);
+            if (this.turn(-1))
+                manualAction = 0;
             break;
         case 4:
-            (a = this.turn(1)) && (manualAction = 0)
+            if (this.turn(1))
+                manualAction = 0;
         }
     }
     ;
@@ -504,14 +509,42 @@ function stepFrame() {
 
     // control the main vehicle agent
     avgSpeedInMPH += vehicles[0].followingSpeed * vehicles[0].speedFactor;
-    if (0 == gFrameCount % 30) {
+    //if (0 == gFrameCount % 30) {
         fullMap.sense(0, input);
-        var reward = (avgSpeedInMPH - 60) / 20;
+        //var reward = (avgSpeedInMPH - 60) / 20;
+        var reward = (avgSpeedInMPH * 30) / 40;
         action = learn(input.flat(), reward);
         if (action < 0 || action >= n.length)
             action = manualAction;
+        if (manualAction != 0)
+            action = manualAction;
+
         avgSpeedInMPH = 0;
-    }
+        if (!headless) {
+            switch (action) {
+                case 1:
+                    s = "/\\";
+                    break;
+                case 2:
+                    s = "\\/";
+                    break;
+                case 3:
+                    s = "<<";
+                    break;
+                case 4:
+                    s = ">>";
+                    break;
+                default:
+                    s = "--";
+            }
+            if (manualAction != 0)
+                s += " M";
+            //manualAction = 0;
+            
+            document.getElementById("action").innerText = s;
+        }
+    //}
+
     vehicles[0].execute(action);
 
     gFrameCount++;

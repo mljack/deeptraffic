@@ -170,7 +170,11 @@ body.custom-background { background-color: #ffffff; }
     <div class="speedBox" style="margin-left: 50px;">
       Speed: <br>
       <span style="font-size:16pt;" id="mph">0</span> mph<br> Cars Passed: <br>
-      <span style="font-size:16pt;" id="passed">0</span>
+      <span style="font-size:16pt;" id="passed">0</span><br>
+      Frame count: <br>
+      <span style="font-size:16pt;" id="frame">0</span><br>
+      Action: <br>
+      <span style="font-size:16pt;" id="action"></span>
     </div>
   </div>
   <div class="gameCol">
@@ -268,7 +272,7 @@ body.custom-background { background-color: #ffffff; }
 lanesSide = 3;
 patchesAhead = 20;
 patchesBehind = 10;
-trainIterations = 10000;
+trainIterations = 100000;
 
 // the number of other autonomous vehicles controlled by your network
 otherAgents = 0; // max of 10
@@ -309,9 +313,9 @@ var tdtrainer_options = {
 
 var opt = {};
 opt.temporal_window = temporal_window;
-opt.experience_size = 3000;
-opt.start_learn_threshold = 500;
-opt.gamma = 0.7;
+opt.experience_size = 10000;
+opt.start_learn_threshold = 5000;
+opt.gamma = 0.9;
 opt.learning_steps_total = 10000;
 opt.learning_steps_burnin = 1000;
 opt.epsilon_min = 0.0;
