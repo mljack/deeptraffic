@@ -103,7 +103,7 @@ function Map(a, b, d) {
     }
 }
 function Vehicle() {
-    this.y = this.x = this.reward = 0;
+    this.y = this.x = this.reward = this.action = 0;
     this.speedFactor = this.followingSpeed = 1;
     this.b = 0;
     this.speedHistory = Array(60);
@@ -155,14 +155,14 @@ function Vehicle() {
         // count passed vehicles
         if (a && 525 > this.y && 525 <= newY) {
             passed++;
-            this.reward++;
+            vehicles[0].reward += 1.0;
             if (!headless) {
                 document.getElementById("passed").innerText = passed;
             }
         }
         else if (a && 525 < this.y && 525 >= newY) {
             passed--;
-            this.reward--;
+            vehicles[0].reward -= 1.0;
             if (!headless) {
                 document.getElementById("passed").innerText = passed;
             }
@@ -212,7 +212,7 @@ function Vehicle() {
         }
         this.followingSpeed = v;
         if (!headless && this == vehicles[0]) {
-            document.getElementById("followingSpeed").innerText = v.toFixed(2);
+            document.getElementById("followingSpeed").innerText = v.toFixed(3);
         }
     }
     ;
@@ -243,7 +243,7 @@ function Vehicle() {
         for (var c = 3 * -this.speedFactor; 4 > c; c++)
             a = a && 100 <= fullMap.get(b, d + c, 0);
         for (c = 3 * -this.speedFactor; 4 > c; c++)
-            safety.set(b, d + c, a ? 0 : 2);
+            safety.set(b, d + c, a ? 0 : vehicles[0].action==3 ? 4 : 2);
 
         // turn right
         b = (this.x + 7.5) / 20 + 1;
@@ -251,7 +251,13 @@ function Vehicle() {
         for (c = 3 * -this.speedFactor; 4 > c; c++)
             a = a && 100 <= fullMap.get(b, d + c, 0);
         for (c = 3 * -this.speedFactor; 4 > c; c++)
-            safety.set(b, d + c, a ? 0 : 2)
+            safety.set(b, d + c, a ? 0 : vehicles[0].action==4 ? 4 : 2);
+    }
+    ;
+    this.updateHUD = function() {
+        if (!headless && this == vehicles[0]) {
+            document.getElementById("speedFactor").innerText = this.speedFactor.toFixed(3);
+        }
     }
     ;
     this.execute = function(action) {
@@ -259,35 +265,34 @@ function Vehicle() {
         case 1:
             if (this.speedFactor < 2) {
                 this.speedFactor += 0.02;
-                if (!headless && this == vehicles[0]) {
-                    document.getElementById("speedFactor").innerText = this.speedFactor.toFixed(2);
-                } 
             }
             else
-                this.reward -= 0.3;
+                this.reward -= 0.02;
             break;
         case 2:
             if (this.speedFactor > 0) {
                 this.speedFactor -= 0.02;
-                if (!headless && this == vehicles[0]) {
-                    document.getElementById("speedFactor").innerText = this.speedFactor.toFixed(2);
-                } 
             }
             else
-                this.reward -= 0.3;
+                this.reward -= 0.02;
             break;
         case 3:
-            if (this.turn(-1))
+            if (this.turn(-1)) {
+                this.action = 0;
                 manualAction = 0;
+            }
             else
-                this.reward -= 3;
+                this.reward -= 0.01;
             break;
         case 4:
-            if (this.turn(1))
+            if (this.turn(1)) {
+                this.action = 0;
                 manualAction = 0;
+            }
             else if (this == vehicles[0])
-                this.reward -= 3;
+                this.reward -= 0.01;
         }
+        this.updateHUD();
     }
     ;
     this.getRecentAvgSpeed = function() {
@@ -476,11 +481,21 @@ function draw() {
                 canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8);
     if (showSafetySystem)
         for (c = 0; c < fullMap.data.length; c++)
-            for (b = 0; b < fullMap.data[c].length; b++)
-                d = safety.get(c, b, 100),
-                0 == d ? (canvas.fillStyle = "rgba(250,120,0,0.5)",
-                canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8)) : 2 == d && (canvas.fillStyle = "rgba(250,0,0,0.5)",
-                canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8));
+            for (b = 0; b < fullMap.data[c].length; b++) {
+                d = safety.get(c, b, 100);
+                if (0 == d) {
+                    canvas.fillStyle = "rgba(250,120,0,0.5)";
+                    canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8);
+                }
+                else if (2 == d) {
+                    canvas.fillStyle = "rgba(250,0,0,0.5)";
+                    canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8);
+                }
+                else if (4 == d) {
+                    canvas.fillStyle = "rgba(250,0,250,0.8)";
+                    canvas.fillRect(20 * c + 2, 10 * b + 2, 18, 8);
+                }
+            }
     if (showInput)
         for (c = -lanesSide; c <= lanesSide; c++)
             for (b = -patchesAhead; b < patchesBehind; b++)
@@ -539,13 +554,14 @@ function stepFrame() {
         if (reward != 0)
             var debug = 1;
         if (!headless) {
-            document.getElementById("reward").innerText = reward.toFixed(2);
+            document.getElementById("reward").innerText = reward.toFixed(3);
         }
         action = learn(input.flat(), reward);
         if (action < 0 || action >= n.length)
             action = manualAction;
         if (manualAction != 0)
             action = manualAction;
+        vehicles[0].action = action;
 
         avgSpeedInMPH = 0;
         if (!headless) {
@@ -573,7 +589,7 @@ function stepFrame() {
         }
     }
 
-    vehicles[0].execute(action);
+    vehicles[0].execute(vehicles[0].action);
 
     gFrameCount++;
     if (0 == gFrameCount % 10000)
