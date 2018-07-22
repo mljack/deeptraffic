@@ -103,7 +103,7 @@ function Map(a, b, d) {
     }
 }
 function Vehicle() {
-    this.y = this.x = 0;
+    this.y = this.x = this.reward = 0;
     this.speedFactor = this.followingSpeed = 1;
     this.b = 0;
     this.speedHistory = Array(60);
@@ -155,12 +155,14 @@ function Vehicle() {
         // count passed vehicles
         if (a && 525 > this.y && 525 <= newY) {
             passed++;
+            this.reward++;
             if (!headless) {
                 document.getElementById("passed").innerText = passed;
             }
         }
         else if (a && 525 < this.y && 525 >= newY) {
             passed--;
+            this.reward--;
             if (!headless) {
                 document.getElementById("passed").innerText = passed;
             }
@@ -209,6 +211,9 @@ function Vehicle() {
             }
         }
         this.followingSpeed = v;
+        if (!headless && this == vehicles[0]) {
+            document.getElementById("followingSpeed").innerText = v.toFixed(2);
+        }
     }
     ;
     this.turn = function(direction) {
@@ -252,20 +257,36 @@ function Vehicle() {
     this.execute = function(action) {
         switch (action) {
         case 1:
-            if (this.speedFactor < 2)
+            if (this.speedFactor < 2) {
                 this.speedFactor += 0.02;
+                if (!headless && this == vehicles[0]) {
+                    document.getElementById("speedFactor").innerText = this.speedFactor.toFixed(2);
+                } 
+            }
+            else
+                this.reward -= 0.3;
             break;
         case 2:
-            if (this.speedFactor > 0)
+            if (this.speedFactor > 0) {
                 this.speedFactor -= 0.02;
+                if (!headless && this == vehicles[0]) {
+                    document.getElementById("speedFactor").innerText = this.speedFactor.toFixed(2);
+                } 
+            }
+            else
+                this.reward -= 0.3;
             break;
         case 3:
             if (this.turn(-1))
                 manualAction = 0;
+            else
+                this.reward -= 3;
             break;
         case 4:
             if (this.turn(1))
                 manualAction = 0;
+            else if (this == vehicles[0])
+                this.reward -= 3;
         }
     }
     ;
@@ -284,7 +305,6 @@ var brains = cloneAgents()
   , avgSpeedInMPH = 0
   , manualAction = 0
   , passed = 0
-  , passedReward = 0
   , fast = !1;
 initializeMap = function(gen) {
     function b(b) {
@@ -348,7 +368,7 @@ reset = function() {
     initializeMap(genA);
     gFrameCount = 0;
     E = 1.5;
-    passed = passedReward = manualAction = avgSpeedInMPH = M = 0
+    passed = manualAction = avgSpeedInMPH = M = 0
 }
 ;
 setFast = function(b) {
@@ -514,8 +534,13 @@ function stepFrame() {
         fullMap.sense(0, input);
         //var reward = (avgSpeedInMPH - 60) / 20;
         //var reward = (avgSpeedInMPH * 30) / 40;
-        var reward = passedReward;
-        passedReward = 0;
+        var reward = vehicles[0].reward;
+        vehicles[0].reward = 0;
+        if (reward != 0)
+            var debug = 1;
+        if (!headless) {
+            document.getElementById("reward").innerText = reward.toFixed(2);
+        }
         action = learn(input.flat(), reward);
         if (action < 0 || action >= n.length)
             action = manualAction;
