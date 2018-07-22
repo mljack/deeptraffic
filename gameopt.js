@@ -284,6 +284,7 @@ var brains = cloneAgents()
   , avgSpeedInMPH = 0
   , manualAction = 0
   , passed = 0
+  , passedReward = 0
   , fast = !1;
 initializeMap = function(gen) {
     function b(b) {
@@ -347,7 +348,7 @@ reset = function() {
     initializeMap(genA);
     gFrameCount = 0;
     E = 1.5;
-    passed = manualAction = avgSpeedInMPH = M = 0
+    passed = passedReward = manualAction = avgSpeedInMPH = M = 0
 }
 ;
 setFast = function(b) {
@@ -509,10 +510,12 @@ function stepFrame() {
 
     // control the main vehicle agent
     avgSpeedInMPH += vehicles[0].followingSpeed * vehicles[0].speedFactor;
-    //if (0 == gFrameCount % 30) {
+    if (0 == gFrameCount % 30) {
         fullMap.sense(0, input);
         //var reward = (avgSpeedInMPH - 60) / 20;
-        var reward = (avgSpeedInMPH * 30) / 40;
+        //var reward = (avgSpeedInMPH * 30) / 40;
+        var reward = passedReward;
+        passedReward = 0;
         action = learn(input.flat(), reward);
         if (action < 0 || action >= n.length)
             action = manualAction;
@@ -543,7 +546,7 @@ function stepFrame() {
             
             document.getElementById("action").innerText = s;
         }
-    //}
+    }
 
     vehicles[0].execute(action);
 
