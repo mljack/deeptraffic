@@ -298,7 +298,8 @@ function Vehicle() {
     this.getRecentAvgSpeed = function() {
         for (var a = 0, b = 0; b < this.speedHistory.length; b++)
             a += this.speedHistory[b];
-        return Math.floor(a / this.speedHistory.length)
+        //return Math.floor(a / this.speedHistory.length);
+        return this.speedHistory[this.speedHistory.length-1];
     }
 }
 for (var fullMap = new Map(7,70,100), safety = new Map(7,70,100), input = new Map(1 + 2 * lanesSide,patchesAhead + patchesBehind,0), C = 0, vehicles = [], L = 0; 20 > L; L++)
@@ -544,6 +545,7 @@ function stepFrame() {
     }
 
     // control the main vehicle agent
+    //var myAction;
     avgSpeedInMPH += vehicles[0].followingSpeed * vehicles[0].speedFactor;
     if (0 == gFrameCount % 30) {
         fullMap.sense(0, input);
@@ -562,6 +564,7 @@ function stepFrame() {
         if (manualAction != 0)
             action = manualAction;
         vehicles[0].action = action;
+        //myAction = vehicles[0].action;
 
         avgSpeedInMPH = 0;
         if (!headless) {
@@ -590,6 +593,7 @@ function stepFrame() {
     }
 
     vehicles[0].execute(vehicles[0].action);
+    //vehicles[0].execute(myAction);
 
     gFrameCount++;
     if (0 == gFrameCount % 10000)
@@ -599,7 +603,7 @@ function stepFrame() {
         if (gFrameCount % 30) {
             mph = vehicles[0].getRecentAvgSpeed();
             if (!isNaN(mph))
-                document.getElementById("mph").innerText = Math.max(0, mph);
+                document.getElementById("mph").innerText = Math.max(0, mph).toFixed(3);
             draw();
         }
     }
