@@ -104,7 +104,7 @@ function Map(a, b, d) {
 }
 function Vehicle() {
     this.y = this.x = this.reward = this.action = 0;
-    this.speedFactor = this.followingSpeed = 1;
+    this.speedFactor = this.followingSpeed = 2;
     this.b = 0;
     this.speedHistory = Array(60);
     this.update = function() {
@@ -211,8 +211,21 @@ function Vehicle() {
             }
         }
         this.followingSpeed = v;
-        if (!headless && this == vehicles[0]) {
-            document.getElementById("followingSpeed").innerText = v.toFixed(3);
+    }
+    ;
+    this.followLeaderEgo = function() {
+        var v = 2;
+        var oldFollowSpeed = this.followingSpeed;
+        for (var distance = 1; distance < 5; distance++) {
+            var speed = fullMap.get((this.x + 7.5) / 20, (this.y - 10 * distance) / 10, 100);
+            if (speed < 100) {
+                v = Math.min(v, .5 * (distance - 1));
+                v = Math.min(v, speed / this.speedFactor);
+            }
+        }
+        this.followingSpeed = v < this.followingSpeed ? v : this.followingSpeed;
+        if (!headless) {
+            document.getElementById("followingSpeed").innerText = this.followingSpeed.toFixed(3);
         }
     }
     ;
@@ -263,15 +276,15 @@ function Vehicle() {
     this.execute = function(action) {
         switch (action) {
         case 1:
-            if (this.speedFactor < 2) {
-                this.speedFactor += 0.02;
+            if (this.followingSpeed < 2) {
+                this.followingSpeed += 0.02;
             }
             else
                 this.reward -= 0.02;
             break;
         case 2:
-            if (this.speedFactor > 0) {
-                this.speedFactor -= 0.02;
+            if (this.followingSpeed > 0) {
+                this.followingSpeed -= 0.01;
             }
             else
                 this.reward -= 0.02;
@@ -516,7 +529,8 @@ function stepFrame() {
     }
     E = 1.5 - (vehicles[0].y - 525);
 
-    for (i = 0; i < vehicles.length; i++) {
+    vehicles[0].followLeaderEgo();
+    for (i = 1; i < vehicles.length; i++) {
         vehicles[i].followLeader();
         if (i > nOtherAgents && rand(genB) > .99 + .004 * vehicles[i].followingSpeed) {
             // NPC vehicles occasionally turn left or right.
@@ -547,11 +561,12 @@ function stepFrame() {
     // control the main vehicle agent
     //var myAction;
     avgSpeedInMPH += vehicles[0].followingSpeed * vehicles[0].speedFactor;
-    if (0 == gFrameCount % 30) {
+    if (0 == gFrameCount % 20) {
         fullMap.sense(0, input);
         //var reward = (avgSpeedInMPH - 60) / 20;
         //var reward = (avgSpeedInMPH * 30) / 40;
-        var reward = vehicles[0].reward;
+        //var reward = vehicles[0].reward;
+        var reward = (avgSpeedInMPH - 40) / 20;
         vehicles[0].reward = 0;
         if (reward != 0)
             var debug = 1;
