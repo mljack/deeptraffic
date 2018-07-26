@@ -89,10 +89,10 @@ function Map(a, b, d) {
           , d = patchesAhead
           , f = patchesBehind;
         if (id == 0)
-            C = vehicles[0].b;
+            C = vehicles[0].gridX;
         for (var offsetX = -c; offsetX <= c; offsetX++)
             for (var offsetY = -d; offsetY < f; offsetY++)
-                input.data[offsetX + c][offsetY + d] = this.get(vehicles[id].b + offsetX, Math.floor(vehicles[id].y) / 10 + offsetY, 0)
+                input.data[offsetX + c][offsetY + d] = this.get(vehicles[id].gridX + offsetX, Math.floor(vehicles[id].y) / 10 + offsetY, 0)
     }
     ;
     this.flat = function() {
@@ -104,50 +104,35 @@ function Map(a, b, d) {
 }
 function Vehicle() {
     this.y = this.x = this.reward = this.action = 0;
+    this.actionSeq = [];
+    this.actionSeqId = 0;
+    this.accumulatedReward = 0;
     this.speedFactor = this.followingSpeed = 2;
-    this.b = 0;
+    this.gridX = 0;
     this.speedHistory = Array(60);
-    this.update = function() {
-        var a = Math.floor(140 * rand(genB) / 20);
-        this.x = 20 * a + 4;
-        switch (a) {
-        case 5 < a:
-            gasPedalModulator = function() {
-                return .5 * rand(genB)
-            }
-            ;
-            break;
-        case 3 < a:
-            gasPedalModulator = function() {
-                return .5 * rand(genB) + .3
-            }
-            ;
-            break;
-        case 5 < a:
-            gasPedalModulator = function() {
-                return .5 * rand(genB) + .4
-            }
-            ;
-            break;
-        case 6 == a:
-            gasPedalModulator = function() {
-                return .6 * rand(genB) + .4
-            }
-            ;
-            break;
+    this.randomSpawn = function() {
+        var locX = Math.floor(140 * rand(genB) / 20);
+        this.x = 20 * locX + 4;
+        switch (locX) {
+        case 5 < locX:
+            gasPedalModulator = function() {return .5 * rand(genB)}; break;
+        case 3 < locX:
+            gasPedalModulator = function() {return .5 * rand(genB) + .3}; break;
+        case 5 < locX:
+            gasPedalModulator = function() {return .5 * rand(genB) + .4}; break;
+        case 6 == locX:
+            gasPedalModulator = function() {return .6 * rand(genB) + .4}; break;
         default:
-            gasPedalModulator = function() {
-                return .5 * rand(genB)
-            }
+            gasPedalModulator = function() {return .5 * rand(genB)}
         }
 
         if (!this.isControlledAgent)
             // random accelerate/brake for NPC vehicles
             this.speedFactor = 1 + .7 * gasPedalModulator();
-        this.b = a
+        this.gridX = locX;
     }
     ;
-    this.update();
+    this.randomSpawn();
     this.y = 10 * Math.floor(700 * Math.random() / 10);
     this.move = function(a) {
         var newY = this.y - (this.followingSpeed * this.speedFactor - E);
@@ -175,22 +160,22 @@ function Vehicle() {
         this.speedHistory[gFrameCount % this.speedHistory.length] = this.followingSpeed * this.speedFactor * 20;
 
         // lateral movement (apply max lateral speed)
-        a = 20 * this.b + 4 - this.x;
-        if (Math.abs(a) < 20 / 30)
-             this.x = 20 * this.b + 4
-        else if (a > 0)
+        deltaX = 20 * this.gridX + 4 - this.x;
+        if (Math.abs(deltaX) < 20 / 30)
+             this.x = 20 * this.gridX + 4
+        else if (deltaX > 0)
             this.x += 20 / 30
-        else // a < 0
+        else // deltaX < 0
             this.x -= 20 / 30;
         
         // looping the road for NPC vehicles
         if (0 > this.y + 68) {
             this.y = 734;
-            this.update();
+            this.randomSpawn();
         }
         if (700 < this.y - 68) {
             this.y = -34;
-            this.update();
+            this.randomSpawn();
         }
     }
     ;
@@ -230,14 +215,13 @@ function Vehicle() {
     }
     ;
     this.turn = function(direction) {
-        var allowed = Math.abs(this.x - (20 * this.b + 4)) < 0.5;
-
         // apply safety system
+        var allowed = Math.abs(this.x - (20 * this.gridX + 4)) < 0.5;
         for (var xx = (this.x + 7.5) / 20 + direction, yy = this.y / 10, offsetY = -3 * this.speedFactor; offsetY < 4; offsetY++)
             allowed = (allowed && fullMap.get(xx, yy + offsetY, 0) >= 100);
 
         if (allowed)
-            this.b += direction;
+            this.gridX += direction;
         return allowed;
     }
     ;
@@ -252,7 +236,7 @@ function Vehicle() {
 
         // turn left
         b = (this.x + 7.5) / 20 + -1;
-        a = .5 > Math.abs(this.x - (20 * this.b + 4));
+        a = .5 > Math.abs(this.x - (20 * this.gridX + 4));
         for (var c = 3 * -this.speedFactor; 4 > c; c++)
             a = a && 100 <= fullMap.get(b, d + c, 0);
         for (c = 3 * -this.speedFactor; 4 > c; c++)
@@ -260,7 +244,7 @@ function Vehicle() {
 
         // turn right
         b = (this.x + 7.5) / 20 + 1;
-        a = .5 > Math.abs(this.x - (20 * this.b + 4));
+        a = .5 > Math.abs(this.x - (20 * this.gridX + 4));
         for (c = 3 * -this.speedFactor; 4 > c; c++)
             a = a && 100 <= fullMap.get(b, d + c, 0);
         for (c = 3 * -this.speedFactor; 4 > c; c++)
@@ -280,14 +264,14 @@ function Vehicle() {
                 this.followingSpeed += 0.02;
             }
             else
-                this.reward -= 0.02;
+                ;//this.reward -= 0.02;
             break;
         case 2:
             if (this.followingSpeed > 0) {
                 this.followingSpeed -= 0.01;
             }
             else
-                this.reward -= 0.02;
+                ;//this.reward -= 0.02;
             break;
         case 3:
             if (this.turn(-1)) {
@@ -295,7 +279,7 @@ function Vehicle() {
                 manualAction = 0;
             }
             else
-                this.reward -= 0.01;
+                ;//this.reward -= 0.01;
             break;
         case 4:
             if (this.turn(1)) {
@@ -303,7 +287,7 @@ function Vehicle() {
                 manualAction = 0;
             }
             else if (this == vehicles[0])
-                this.reward -= 0.01;
+                ;//this.reward -= 0.01;
         }
         this.updateHUD();
     }
@@ -342,7 +326,7 @@ initializeMap = function(gen) {
     }
     vehicles[0].y = 525;
     vehicles[0].x = 64;
-    vehicles[0].b = 3;
+    vehicles[0].gridX = 3;
     legalLocations = Array(490).fill().map(function(a, b) {
         return b
     });
@@ -360,7 +344,7 @@ initializeMap = function(gen) {
             legalLocations.splice(legalLocations.indexOf(loc[h]), 1);
         vehicles[g].x = Math.floor(20 * xx + 4);
         vehicles[g].y = Math.floor(yy / 70 * 700);
-        vehicles[g].b = xx;
+        vehicles[g].gridX = xx;
         if (vehicles[g].isControlledAgent)
             vehicles[g].speedFactor = 1.7;
     }
@@ -399,21 +383,34 @@ function keyboardHander(event, released) {
     if (3 == manualAction || 4 == manualAction)
         action = manualAction;
     switch (event.keyCode) {
-    case 39:
-        event.preventDefault();
-        action = 4;
-        break;
-    case 37:
-        event.preventDefault();
-        action = 3;
-        break;
-    case 38:
+    case 38:    // up
+    case 104:   // numpad 8
         event.preventDefault();
         action = 1;
         break;
-    case 40:
+    case 40:    // down
+    case 101:   // numpad 5
         event.preventDefault(),
         action = 2
+        break;
+    case 37:    // left
+    case 100:   // numpad 4
+        event.preventDefault();
+        action = 3;
+        break;
+    case 39:    // right
+    case 102:   // numpad 6
+        event.preventDefault();
+        action = 4;
+        break;
+    case 97:    // numpad 1
+        event.preventDefault();
+        action = 5;
+        break;
+    case 99:    // numpad 3
+        event.preventDefault();
+        action = 6;
+        break;
     }
     if (released)
         manualAction = action;
@@ -561,29 +558,52 @@ function stepFrame() {
     // control the main vehicle agent
     //var myAction;
     avgSpeedInMPH += vehicles[0].followingSpeed * vehicles[0].speedFactor;
-    if (0 == gFrameCount % 20) {
+    if (0 == gFrameCount % 30) {
         fullMap.sense(0, input);
         //var reward = (avgSpeedInMPH - 60) / 20;
         //var reward = (avgSpeedInMPH * 30) / 40;
-        //var reward = vehicles[0].reward;
-        var reward = (avgSpeedInMPH - 40) / 20;
-        vehicles[0].reward = 0;
-        if (reward != 0)
-            var debug = 1;
-        if (!headless) {
-            document.getElementById("reward").innerText = reward.toFixed(3);
+        var reward = vehicles[0].reward;
+        //var reward = (avgSpeedInMPH - 40) / 20;
+        
+        if (vehicles[0].actionSeqId == 0) {
+            reward += vehicles[0].accumulatedReward;
+            action = learn(input.flat(), reward);
+            if (action < 0 || action >= n.length)
+                action = manualAction;
+            if (manualAction != 0)
+                action = manualAction;
+            if (!headless) {
+                document.getElementById("reward").innerText = reward.toFixed(3)+(vehicles[0].accumulatedReward == 0 ? "" : " !");
+            }
+            vehicles[0].accumulatedReward = 0;
+            vehicles[0].reward = 0;
         }
-        action = learn(input.flat(), reward);
-        if (action < 0 || action >= n.length)
-            action = manualAction;
-        if (manualAction != 0)
-            action = manualAction;
-        vehicles[0].action = action;
+        else {
+            vehicles[0].accumulatedReward += reward;
+            vehicles[0].reward = 0;
+            if (!headless) {
+                document.getElementById("reward").innerText = reward.toFixed(3) +"+";
+            }
+        }
+       
+        // action sequence
+        if (manualAction == 5) {
+            manualAction = 0;
+            vehicles[0].actionSeq = [2,2,1,3,3,1,1,1,1];
+            vehicles[0].actionSeqId = 5;
+        }
+        if (vehicles[0].actionSeq.length > 0) {
+            vehicles[0].action = vehicles[0].actionSeq.shift();
+        }
+        else {
+            vehicles[0].actionSeqId = 0;
+            vehicles[0].action = action;
+        }
         //myAction = vehicles[0].action;
 
         avgSpeedInMPH = 0;
         if (!headless) {
-            switch (action) {
+            switch (vehicles[0].action) {
                 case 1:
                     s = "/\\";
                     break;
@@ -601,6 +621,8 @@ function stepFrame() {
             }
             if (manualAction != 0)
                 s += " M";
+            if (vehicles[0].actionSeqId > 0)
+                s += " S" + vehicles[0].actionSeqId + "["+ vehicles[0].actionSeq.length + "]";
             //manualAction = 0;
             
             document.getElementById("action").innerText = s;
@@ -624,46 +646,51 @@ function stepFrame() {
     }
 }
 evalRun = !1;
-doEvalRun = function(a, b, d, c, f) {
-    if (!0 === d)
-        for (t = r = 0,
-        "undefined" != typeof brain && brain.reset_seed(0),
-        d = 0; d < brains.length; d++)
+doEvalRun = function(numRuns, framesPerRun, useFixedSeed, callback, f) {
+    if (!0 === useFixedSeed) {
+        if ("undefined" != typeof brain)
+            brain.reset_seed(0);
+        t = r = 0;
+        for (d = 0; d < brains.length; d++)
             brains[d].reset_seed(0);
+    }
     else {
-        "undefined" != typeof brain && brain.reset_seed(Math.floor(1E7 * Math.random()));
+        if ("undefined" != typeof brain)
+            brain.reset_seed(Math.floor(1E7 * Math.random()));
         for (d = 0; d < brains.length; d++)
             brains[d].reset_seed(Math.floor(1E7 * Math.random()));
         r = Math.floor(1E7 * Math.random());
         t = Math.floor(1E7 * Math.random())
     }
     d = NaN;
-    "undefined" != typeof c && (d = f);
+    if ("undefined" != typeof callback)
+        d = f;
     headless = !0;
     var l = fast;
     evalRun = fast = !0;
-    f = [];
-    for (var h = 0, g = 0; g < a; g++) {
-        console.log("run: " + (g + 1) + "/" + a);
+    avgSpeeds = [];
+    for (var frameCount = 0, g = 0; g < numRuns; g++) {
+        console.log("run: " + (g + 1) + "/" + numRuns);
         reset();
-        for (var O = 0, P = 0; P < b; P++) {
-            0 == h % d && c();
+        for (var avgSpeed = 0, i = 0; i < framesPerRun; i++) {
+            if (0 == frameCount % d)
+                callback();
             stepFrame();
-            for (var B = 0; B < nOtherAgents + 1; B++)
-                O += Math.max(0, vehicles[B].followingSpeed * vehicles[B].speedFactor) / (nOtherAgents + 1);
-            h++
+            for (var j = 0; j < nOtherAgents + 1; j++)
+                avgSpeed += Math.max(0, vehicles[j].followingSpeed * vehicles[j].speedFactor) / (nOtherAgents + 1);
+            frameCount++;
         }
-        f.push(Math.floor(O / b * 2000) / 100)
+        avgSpeeds.push(Math.floor(avgSpeed / framesPerRun * 2000) / 100)
     }
     reset();
     fast = l;
     evalRun = headless = !1;
-    f.sort();
-    console.log(f);
-    for (c = b = 0; c < f.length; c++)
-        b += f[c];
-    console.log("avg: " + b / a + " median: " + f[a / 2]);
-    return f[a / 2]
+    avgSpeeds.sort();
+    console.log(avgSpeeds);
+    for (c = v = 0; c < avgSpeeds.length; c++)
+        v += avgSpeeds[c];
+    console.log("avg: " + v / numRuns + " median: " + avgSpeeds[numRuns / 2]);
+    return avgSpeeds[numRuns / 2]
 }
 ;
 initializeMap(genA);
